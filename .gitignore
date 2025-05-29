@@ -1,0 +1,15 @@
+*.pyc
+pycache/**
+pycache/
+.pytest_cache/
+*.log
+*.csv
+
+*.db
+*sqlite3
+*.sqlite
+.venv/**
+.venv/
+.venv
+
+

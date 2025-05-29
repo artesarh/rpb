@@ -1,0 +1,10 @@
+-r base.txt # include base + test only
+
+django-schema-viewer==0.5.3
+faker==37.4.0
+pytest==8.4.0
+pytest-django==4.11.1
+
+djangorestframework-stubs==3.16.0  # https://github.com/typeddjango/djangorestframework-stubs
+factory-boy==3.3.2  # https://github.com/FactoryBoy/factory_boy
+django-extensions==4.1  # https://github.com/django-extensions/django-extensions

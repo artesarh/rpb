@@ -1,0 +1,13 @@
+<nav>
+    <a href="{% url 'frontend:home' %}">Home</a>
+    <a href="{% url 'admin:index' %}">Admin Panel</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'frontend:logout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'frontend:login' %}">Login</a>
+        <a href="{% url 'frontend:register' %}">Register</a>
+    {% endif %}
+    <a href="{% url 'api:swagger' %}">Swagger Docs</a>
+    <a href="{% url 'api:api-root' %}">DRF API</a>
+    <a href="{% url 'frontend:token_generator' %}">Generate Token</a>
+</nav>
