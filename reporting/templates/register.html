@@ -1,0 +1,77 @@
+<!-- reporting/templates/register.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    {% load static %}
+    <style>
+      nav {
+        background-color: #333;
+        padding: 1em;
+      }
+      nav a {
+        color: white;
+        margin-right: 1em;
+        text-decoration: none;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      .content {
+        padding: 2em;
+      }
+      .form-group {
+        margin-bottom: 1em;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Register</a>
+      <a href="/api/docs/swagger/">API Documentation</a>
+    </nav>
+    <div class="content">
+      <h1>Register</h1>
+      {% if messages %} {% for message in messages %}
+      <p
+        class="{% if message.tags == 'error' %}error{% else %}success{% endif %}"
+      >
+        {{ message }}
+      </p>
+      {% endfor %} {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="password2">Confirm Password:</label>
+          <input type="password" id="password2" name="password2" required />
+        </div>
+        <button type="submit">Register</button>
+      </form>
+      <p>
+        Already have an account? <a href="{% url 'login' %}">Login here</a>.
+      </p>
+    </div>
+  </body>
+</html>

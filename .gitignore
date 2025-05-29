@@ -1,0 +1,14 @@
+*.pyc
+pycache/**
+pycache/
+*.log
+*.csv
+
+*.db
+*sqlite3
+*.sqlite
+.venv/**
+.venv/
+.venv
+
+
