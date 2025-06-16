@@ -40,4 +40,5 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     path("register/", register_view, name="register"),
     path("token-generator/", token_generator_view, name="token_generator"),
+    path("schema-viewer/", include("schema_viewer.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

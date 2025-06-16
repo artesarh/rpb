@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}EM Reporting Backend{% endblock %}</title>
+    {% load static %}
+    <!-- Styles will be added in Step 2 -->
+{% include 'components/styles.html' %}
+    {% block extra_styles %}{% endblock %}
+  </head>
+  <body>
+    {% include 'components/nav.html' %}
+    <div class="content">
+      {% if messages %} {% for message in messages %}
+      <p
+        class="{% if message.tags == 'error' %}error{% else %}success{% endif %}"
+      >
+        {{ message }}
+      </p>
+      {% endfor %} {% endif %} {% block content %}
+      <!-- This is the "slot" for page-specific content -->
+      {% endblock %}
+    </div>
+  </body>
+</html>

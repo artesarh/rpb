@@ -71,3 +71,9 @@ class ReportWithEventGroupDetailModifierSerializer(
     """Add modifier to inherited class"""
 
     modifier = ReportModifierSerializer()
+
+
+class LinkReportToModifierSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    report_id = serializers.IntegerField()
+    modifier_id = serializers.IntegerField()

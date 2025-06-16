@@ -1,6 +1,7 @@
 *.pyc
 pycache/**
 pycache/
+.pytest_cache/
 *.log
 *.csv
 

@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from api.serializers import (
     ReportWithModifierSerializer,
     ReportWithEventGroupDetailSerializer,
     ReportWithEventGroupDetailModifierSerializer,
+    LinkReportToModifierSerializer,
 )
 
 
@@ -20,7 +22,7 @@ class ReportViewSet(viewsets.ModelViewSet):
     def get_report_with_specific_modifier(self, request, pk=None, modifier_id=None):
         report = self.get_object()
         try:
-            modifier = ReportModifier.objects.get(id=modifier_id, reports=report)
+            modifier = report.modifiers.filter(id=modifier_id).first()
         except ReportModifier.DoesNotExist:
             raise NotFound(
                 "ReportModifier not found or not associated with this report."
@@ -30,19 +32,19 @@ class ReportViewSet(viewsets.ModelViewSet):
         )
         return Response(serializer.data)
 
-    @action(detail=True, methods=["get"], url_path="link-modifier/(?P<modifier_id>\d+)")
+    @action(
+        detail=True,
+        methods=["post", "patch"],
+        url_path="link-modifier/(?P<modifier_id>\d+)",
+    )
     def link_report_with_modifier(self, request, pk=None, modifier_id=None):
         report = self.get_object()
-        try:
-            modifier = ReportModifier.objects.get(id=modifier_id)
-            report.modifiers.add(modifier)
-        except ReportModifier.DoesNotExist:
-            raise NotFound("Report modifier not found")
-
-        except Report.DoesNotExist:
-            raise NotFound("Report does not exist")
-
-        return Response("Success")
+        modifier = get_object_or_404(report.modifiers.filter(id=modifier_id).first())
+        report.modifiers.add(modifier)
+        serializer = LinkReportToModifierSerializer(
+            status="Success", report_id=pk, modifier_id=modifier_id
+        )
+        return Response(serializer.data)
 
     @action(detail=True, methods=["get"], url_path="events")
     def get_report_with_eventgroup_detail(self, request, pk=None):

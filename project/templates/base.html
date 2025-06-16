@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}My Django App{% endblock %}</title>
+    {% load static %}
+    <style>
+      nav {
+        background-color: #333;
+        padding: 1em;
+      }
+      nav a {
+        color: white;
+        margin-right: 1em;
+        text-decoration: none;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      .content {
+        padding: 2em;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'components/nav.html' %}
+    <div class="content">{% block content %}{% endblock %}</div>
+  </body>
+</html>

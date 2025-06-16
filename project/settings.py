@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "unfold.contrib.filters",  # Optional: for special filters
     "unfold.contrib.forms",  # Optional: for special form elements
     "django_seed",
+    "schema_viewer",
     # fidelis app
     "api",
 ]
@@ -77,11 +78,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # custom exposure management code to bubble exceptions
     "api.middleware.CustomDjangoExceptionMiddleware",
 ]
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
@@ -99,12 +101,12 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-ROOT_URLCONF = "reporting.urls"
+ROOT_URLCONF = "project.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "reporting/templates"],  # Add this line
+        "DIRS": [BASE_DIR / "project/templates"],  # Add this line
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -116,7 +118,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "reporting.wsgi.application"
+WSGI_APPLICATION = "project.wsgi.application"
 
 # Database
 DATABASES = {
@@ -124,11 +126,18 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     },
+    "api_db": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "api.sqlite3",
+    },
     "reference_db": {
         "ENGINE": "django.db.backends.sqlite3",  # or your database type
         "NAME": BASE_DIR / "reference.sqlite",
     },
 }
+
+DATABASE_ROUTERS = ["project.db_router.ApiDatabaseRouter"]
+
 
 CACHES = {
     "default": {
