@@ -1,0 +1,6 @@
+-r base.txt # include base + test only
+
+django-schema-viewer==0.5.3
+faker==37.4.0
+pytest==8.4.0
+pytest-django==4.11.1

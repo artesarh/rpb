@@ -4,6 +4,7 @@ pycache/
 .pytest_cache/
 *.log
 *.csv
+.env
 
 *.db
 *sqlite3
