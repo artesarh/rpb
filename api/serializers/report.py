@@ -14,8 +14,7 @@ class ReportModifierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportModifier
-        fields = ["id", "as_at_date", "fx_date",
-                  "quarter", "year", "month", "day"]
+        fields = ["id", "as_at_date", "fx_date", "quarter", "year", "month", "day"]
 
 
 class ReportSerializer(serializers.HyperlinkedModelSerializer):
@@ -58,13 +57,32 @@ class ReportWithoutModifierSerializer(serializers.ModelSerializer):
         return data
 
 
-class ReportWithModifierSerializer(serializers.Serializer):
+class ReportWithModifierSerializerOut(serializers.Serializer):
+    report = ReportWithoutModifierSerializer()
+    modifier = ReportModifierSerializer()
+
+
+class ReportWithModifierSerializerIn(serializers.Serializer):
     """
-    Report with modifier at top level
+    Report with modifiers at top level
     """
 
     report = ReportWithoutModifierSerializer()
     modifier = ReportModifierSerializer()
+
+
+class ReportWithModifierListSerializerOut(serializers.Serializer):
+    report = ReportWithoutModifierSerializer()
+    modifiers = ReportModifierSerializer(many=True)
+
+
+class ReportWithModifierListSerializerIn(serializers.Serializer):
+    """
+    Report with modifiers at top level
+    """
+
+    report = ReportWithoutModifierSerializer()
+    modifiers = ReportModifierSerializer(many=True)
 
 
 class ReportWithEventGroupDetailSerializer(serializers.Serializer):
@@ -80,15 +98,3 @@ class ReportWithEventGroupDetailModifierSerializer(
     """Add modifier to inherited class"""
 
     modifier = ReportModifierSerializer()
-
-
-class LinkReportToModifierSerializer(serializers.Serializer):
-    status = serializers.CharField()
-    report_id = serializers.IntegerField()
-    modifier_id = serializers.IntegerField()
-
-
-class LinkModifierRequestSerializer(serializers.Serializer):
-    modifier_id = serializers.IntegerField(
-        required=True, help_text="The ID of the modifier to link to the report"
-    )

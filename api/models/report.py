@@ -79,22 +79,22 @@ class ReportModifier(models.Model):
     )
 
     @property
-    def quarter(self):
+    def quarter(self) -> int:
         if not self.as_at_date:
             return None
         month = self.as_at_date.month
         return (month - 3) // 4
 
     @property
-    def year(self):
+    def year(self) -> int:
         return self.as_at_date.year if self.as_at_date else None
 
     @property
-    def month(self):
+    def month(self) -> int:
         return self.as_at_date.month if self.as_at_date else None
 
     @property
-    def day(self):
+    def day(self) -> int:
         return self.as_at_date.day if self.as_at_date else None
 
     class Meta:

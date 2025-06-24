@@ -19,6 +19,7 @@ from api.views import (
     RingEventViewSet,
     BoxEventViewSet,
     GeoEventViewSet,
+    LinkModifierViewSet,
 )
 
 
@@ -31,7 +32,7 @@ router.register(r"event-groups", EventGroupViewSet, basename="event-group")
 router.register(r"ring-events", RingEventViewSet, basename="ring-event")
 router.register(r"box-events", BoxEventViewSet, basename="box-event")
 router.register(r"geo-events", GeoEventViewSet, basename="geo-event")
-
+router.register(r"link-modifier", LinkModifierViewSet, basename="link-modifier")
 app_name = "api"  # Ensure namespace is defined
 
 urlpatterns = [

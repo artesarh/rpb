@@ -110,6 +110,7 @@ SPECTACULAR_SETTINGS = {
         "persistAuthorization": True,
     },
     "COMPONENT_SPLIT_REQUEST": True,
+    "DEBUG": True,
 }
 
 MIDDLEWARE = [

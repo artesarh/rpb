@@ -1,18 +1,18 @@
-from rest_framework.routers import DefaultRouter
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from api.models import Report, ReportModifier
 from api.serializers import (
     ReportSerializer,
-    ReportWithModifierSerializer,
+    ReportWithModifierListSerializerIn,
+    ReportWithModifierListSerializerOut,
+    ReportWithModifierSerializerIn,
+    ReportWithModifierSerializerOut,
     EventGroupSerializer,
-    LinkModifierRequestSerializer,
-    LinkReportToModifierSerializer,
+    ReportWithEventGroupDetailModifierSerializer,
 )
-from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
 class ReportViewSet(viewsets.ModelViewSet):
@@ -20,47 +20,69 @@ class ReportViewSet(viewsets.ModelViewSet):
         "modifiers"
     )
     serializer_class = ReportSerializer
+    http_method_names = ["get", "post", "patch", "put"]
 
     def get_queryset(self):
         return self.queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="modifier_id",
+                type=int,
+                location=OpenApiParameter.PATH,
+                description="ID of the modifier to retrieve",
+            )
+        ],
+        responses={
+            200: ReportWithModifierSerializerOut,
+            404: OpenApiResponse(description="Report or modifier not found"),
+        },
+        operation_id="get_report_modifier",
+    )
     @action(detail=True, methods=["get"], url_path="modifiers/(?P<modifier_id>\d+)")
     def get_modifier(self, request, pk=None, modifier_id=None):
+        """Get a specific report and a specific modifier."""
         report = self.get_object()
-        modifier = get_object_or_404(
-            ReportModifier, id=modifier_id, reports=report)
-        serializer = ReportWithModifierSerializer(
+        modifier = get_object_or_404(ReportModifier, id=modifier_id, reports=report)
+        serializer = ReportWithModifierSerializerOut(
             {"report": report, "modifier": modifier}, context={"request": request}
         )
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"], url_path="link-modifier")
     @extend_schema(
-        request=LinkModifierRequestSerializer,
         responses={
-            200: OpenApiResponse(
-                description="Successfully linked modifier",
-                response=LinkReportToModifierSerializer,
-            )
+            200: ReportWithModifierListSerializerOut,
+            404: OpenApiResponse(description="Report or modifiers not found"),
         },
+        operation_id="get_report_modifiers_list",
     )
-    def link_modifier(self, request, pk=None):
-        serializer = LinkModifierRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        modifier_id = serializer.validated_data["modifier_id"]
-        report = self.get_object()
-        modifier = get_object_or_404(ReportModifier, id=modifier_id)
-        report.modifiers.add(modifier)
-        return Response(
-            {"status": "success", "report_id": pk, "modifier_id": modifier_id}
-        )
+    @action(detail=True, methods=["get"], url_path="modifiers")
+    def get_modifiers_list(self, request, pk=None):
+        """Get a report with all its modifiers."""
 
-    @action(detail=True, methods=["get"], url_path="event-group")
-    def get_event_group(self, request, pk=None):
         report = self.get_object()
-        if not report.event_group:
-            raise NotFound("No Event Group associated with this report")
-        serializer = EventGroupSerializer(
-            report.event_group, context={"request": request}
+        modifiers = ReportModifier.objects.filter(reports=report)
+        if not modifiers.exists():
+            raise NotFound("No modifiers found for this report.")
+        serializer = ReportWithModifierListSerializerOut(
+            {"report": report, "modifiers": modifiers}, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"], url_path="modifier/(?P<modifier_id>\d+)/all")
+    def get_report_with_eventdetail_modifier(self, request, pk=None, modifier_id=None):
+        report = self.get_object()
+        eventgroup = report.event_group
+        if not eventgroup:
+            raise NotFound("No Event Group associated with report")
+
+        modifier = report.modifiers.filter(id=modifier_id).first()
+
+        if not modifier:
+            raise NotFound("No modifier found")
+
+        serializer = ReportWithEventGroupDetailModifierSerializer(
+            {"report": report, "eventgroup": eventgroup, "modifier": modifier}
         )
         return Response(serializer.data)
