@@ -6,12 +6,11 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRespon
 from api.models import Report, ReportModifier
 from api.serializers import (
     ReportSerializer,
-    ReportWithModifierListSerializerIn,
-    ReportWithModifierListSerializerOut,
-    ReportWithModifierSerializerIn,
-    ReportWithModifierSerializerOut,
+    ReportModifierSerializer,
+    ReportWithAllSerializer,
+    ReportWithModifierSerializer,
+    ReportWithModifiersListSerializer,
     EventGroupSerializer,
-    ReportWithEventGroupDetailModifierSerializer,
 )
 
 
@@ -35,7 +34,7 @@ class ReportViewSet(viewsets.ModelViewSet):
             )
         ],
         responses={
-            200: ReportWithModifierSerializerOut,
+            200: ReportWithModifierSerializer,
             404: OpenApiResponse(description="Report or modifier not found"),
         },
         operation_id="get_report_modifier",
@@ -45,14 +44,14 @@ class ReportViewSet(viewsets.ModelViewSet):
         """Get a specific report and a specific modifier."""
         report = self.get_object()
         modifier = get_object_or_404(ReportModifier, id=modifier_id, reports=report)
-        serializer = ReportWithModifierSerializerOut(
+        serializer = ReportWithModifierSerializer(
             {"report": report, "modifier": modifier}, context={"request": request}
         )
         return Response(serializer.data)
 
     @extend_schema(
         responses={
-            200: ReportWithModifierListSerializerOut,
+            200: ReportWithModifiersListSerializer,
             404: OpenApiResponse(description="Report or modifiers not found"),
         },
         operation_id="get_report_modifiers_list",
@@ -65,11 +64,18 @@ class ReportViewSet(viewsets.ModelViewSet):
         modifiers = ReportModifier.objects.filter(reports=report)
         if not modifiers.exists():
             raise NotFound("No modifiers found for this report.")
-        serializer = ReportWithModifierListSerializerOut(
+        serializer = ReportWithModifiersListSerializer(
             {"report": report, "modifiers": modifiers}, context={"request": request}
         )
         return Response(serializer.data)
 
+    @extend_schema(
+        responses={
+            200: ReportWithAllSerializer,
+            404: OpenApiResponse(description="Report or modifiers not found"),
+        },
+        operation_id="get_report_modifiers_list",
+    )
     @action(detail=True, methods=["get"], url_path="modifier/(?P<modifier_id>\d+)/all")
     def get_report_with_eventdetail_modifier(self, request, pk=None, modifier_id=None):
         report = self.get_object()
@@ -82,7 +88,7 @@ class ReportViewSet(viewsets.ModelViewSet):
         if not modifier:
             raise NotFound("No modifier found")
 
-        serializer = ReportWithEventGroupDetailModifierSerializer(
+        serializer = ReportWithAllSerializer(
             {"report": report, "eventgroup": eventgroup, "modifier": modifier}
         )
         return Response(serializer.data)

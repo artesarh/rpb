@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from api.models.report import Report, ReportModifier
 from api.models.event import EventGroup
-from api.serializers.event import (
-    EventGroupDetailedSerializer,
-)
+from api.serializers.event import EventGroupDetailedSerializer
 
 
 class ReportModifierSerializer(serializers.ModelSerializer):
@@ -38,63 +36,27 @@ class ReportSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {"url": {"view_name": "api:report-detail"}}
 
 
-class ReportWithoutModifierSerializer(serializers.ModelSerializer):
-    """
-    Report but without nested modifier key
-    """
-
+class _ReportWithoutModifierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
-        fields = "__all__"  # Include all fields by default
+        fields = "__all__"  # Include all model fields
         extra_kwargs = {
+            # Ignore reverse relation
             "modifiers": {"read_only": True, "required": False}
-        }  # Exclude from output
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        # Ensure modifiers is removed from the response
-        data.pop("modifiers", None)
-        return data
+        }
 
 
-class ReportWithModifierSerializerOut(serializers.Serializer):
-    report = ReportWithoutModifierSerializer()
+class ReportWithModifierSerializer(serializers.Serializer):
+    report = _ReportWithoutModifierSerializer()
     modifier = ReportModifierSerializer()
 
 
-class ReportWithModifierSerializerIn(serializers.Serializer):
-    """
-    Report with modifiers at top level
-    """
-
-    report = ReportWithoutModifierSerializer()
-    modifier = ReportModifierSerializer()
-
-
-class ReportWithModifierListSerializerOut(serializers.Serializer):
-    report = ReportWithoutModifierSerializer()
+class ReportWithModifiersListSerializer(serializers.Serializer):
+    report = _ReportWithoutModifierSerializer()
     modifiers = ReportModifierSerializer(many=True)
 
 
-class ReportWithModifierListSerializerIn(serializers.Serializer):
-    """
-    Report with modifiers at top level
-    """
-
-    report = ReportWithoutModifierSerializer()
-    modifiers = ReportModifierSerializer(many=True)
-
-
-class ReportWithEventGroupDetailSerializer(serializers.Serializer):
-    """ """
-
-    report = ReportWithoutModifierSerializer()
+class ReportWithAllSerializer(serializers.Serializer):
+    report = _ReportWithoutModifierSerializer()
     eventgroup = EventGroupDetailedSerializer()
-
-
-class ReportWithEventGroupDetailModifierSerializer(
-    ReportWithEventGroupDetailSerializer
-):
-    """Add modifier to inherited class"""
-
-    modifier = ReportModifierSerializer()
+    modifier = ReportModifierSerializer(required=False)
