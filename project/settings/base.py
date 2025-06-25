@@ -71,6 +71,7 @@ THIRD_PARTY_APPS = [
     "schema_viewer",
     "drf_spectacular",
     "rest_framework",
+    "django_celery_beat",
 ]
 
 FIDELIS_APPS = [
