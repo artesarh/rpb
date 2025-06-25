@@ -27,15 +27,17 @@ TIME_ZONE = "UTC"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db" / "core.sqlite3",
+        "NAME": BASE_DIR / f"{env.str("DB_PATH_APP", default="db/app.sqlite")}",
     },
     "api_db": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db" / "reporting.sqlite3",
+        "NAME": BASE_DIR
+        / f"{env.str("DB_PATH_REPORTING", default="db/reporting.sqlite")}",
     },
     "reference_db": {
         "ENGINE": "django.db.backends.sqlite3",  # or your database type
-        "NAME": BASE_DIR / "db" / "reference.sqlite",
+        "NAME": BASE_DIR
+        / f"{env.str("DB_PATH_REFEREBCE", default="db/reference.sqlite")}",
     },
 }
 
@@ -230,4 +232,16 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+}
+
+CELERY_BROKER_URL = "filesystem://"  # We'll use filesystem broker for simplicity
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "data_folder_in": "celery/queue",
+    "data_folder_out": "celery/queue",
+    "data_folder_processed": "celery/processed",
 }
