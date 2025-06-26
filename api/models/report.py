@@ -29,6 +29,7 @@ class Report(models.Model):
         # db_table="_jt_reports_eventgroups",
         blank=True,
         on_delete=models.RESTRICT,
+        null=True,
     )
     cron = models.CharField(
         max_length=50, blank=True, null=True, validators=[validate_cron]
@@ -47,8 +48,7 @@ class Report(models.Model):
     gross_node_id = models.IntegerField(null=True)
     net_node_id = models.IntegerField(null=True)
     rollup_context_id = models.IntegerField(null=True, default=42)
-    dynamic_ring_loss_threshold = models.IntegerField(
-        default=5000000, null=True)
+    dynamic_ring_loss_threshold = models.IntegerField(default=5000000, null=True)
     blast_radius = models.FloatField(default=50, null=True)
     no_overlap_radius = models.FloatField(default=50, null=True)
     is_valid = models.BooleanField(default=True, null=False)

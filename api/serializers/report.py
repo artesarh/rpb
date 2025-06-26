@@ -23,7 +23,13 @@ class ReportSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field="id",
         lookup_url_kwarg="modifier_id",
     )
-    event_group = serializers.HyperlinkedRelatedField(
+    event_group = serializers.PrimaryKeyRelatedField(
+        queryset=EventGroup.objects.all(),
+        allow_null=True,
+        required=False,
+    )
+    event_group_detail = serializers.HyperlinkedRelatedField(
+        source="event_group",
         read_only=True,
         view_name="api:event-group-detail",
         lookup_field="id",
@@ -34,6 +40,16 @@ class ReportSerializer(serializers.HyperlinkedModelSerializer):
         model = Report
         fields = "__all__"
         extra_kwargs = {"url": {"view_name": "api:report-detail"}}
+    
+    def to_representation(self, instance):
+        """Custom representation to include both ID and hyperlink for event_group"""
+        data = super().to_representation(instance)
+        # Add the hyperlinked version for API browsability
+        if instance.event_group:
+            request = self.context.get('request')
+            if request:
+                data['event_group_detail'] = self.fields['event_group_detail'].to_representation(instance.event_group)
+        return data
 
 
 class _ReportWithoutModifierSerializer(serializers.ModelSerializer):

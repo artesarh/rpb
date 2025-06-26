@@ -5,7 +5,7 @@ Django settings for reporting project.
 
 from datetime import timedelta
 from pathlib import Path
-
+import os
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,8 +41,8 @@ DATABASES = {
     },
 }
 
-# DATABASE_ROUTERS = ["project.routers.ApiDatabaseRouter"]
-DATABASE_ROUTERS = []
+DATABASE_ROUTERS = ["project.routers.ApiDatabaseRouter"]
+# DATABASE_ROUTERS = []
 
 
 # Quick-start development settings - unsuitable for production
@@ -71,6 +71,7 @@ THIRD_PARTY_APPS = [
     "schema_viewer",
     "drf_spectacular",
     "rest_framework",
+    "django_filter",
     "django_celery_beat",
 ]
 

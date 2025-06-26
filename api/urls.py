@@ -20,6 +20,7 @@ from api.views import (
     BoxEventViewSet,
     GeoEventViewSet,
     LinkModifierViewSet,
+    api_root,
 )
 
 
@@ -36,7 +37,8 @@ router.register(r"link-modifier", LinkModifierViewSet, basename="link-modifier")
 app_name = "api"  # Ensure namespace is defined
 
 urlpatterns = [
-    path("", include(router.urls), name="api-root"),
+    path("", api_root, name="api-root"),
+    path("", include(router.urls)),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(
