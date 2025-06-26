@@ -51,9 +51,11 @@ class BaseViewSetMixin:
     @action(detail=False, methods=['get'])
     def metadata(self, request):
         """Provide metadata about the resource"""
-        return Response({
-            'model': self.queryset.model.__name__,
-            'fields': [field.name for field in self.queryset.model._meta.fields],
+        # Get the queryset through the method to handle dynamic querysets
+        queryset = self.get_queryset() if hasattr(self, 'get_queryset') else getattr(self, 'queryset', None)
+        model = queryset.model if queryset else None
+        
+        response_data = {
             'actions': {
                 'list': f"{request.build_absolute_uri()}",
                 'create': f"{request.build_absolute_uri()}",
@@ -64,7 +66,15 @@ class BaseViewSetMixin:
             'filters': getattr(self, 'filterset_fields', []),
             'search_fields': getattr(self, 'search_fields', []),
             'ordering_fields': getattr(self, 'ordering_fields', []),
-        })
+        }
+        
+        if model:
+            response_data.update({
+                'model': model.__name__,
+                'fields': [field.name for field in model._meta.fields],
+            })
+            
+        return Response(response_data)
 
 
 class ReportModifierViewSet(BaseViewSetMixin, viewsets.ModelViewSet):

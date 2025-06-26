@@ -50,8 +50,9 @@ def api_root(request, format=None):
                 'description': 'Manage different types of geographical events'
             },
             'relationships': {
-                'link_modifiers': request.build_absolute_uri(reverse('api:link-modifier-list')),
-                'link_summary': f"{request.build_absolute_uri(reverse('api:link-modifier-list'))}summary/",
+                'link_single': f"{request.build_absolute_uri().rstrip('/')}link-modifier/single/",
+                'link_multiple': f"{request.build_absolute_uri().rstrip('/')}link-modifier/multiple/",
+                'link_summary': f"{request.build_absolute_uri().rstrip('/')}link-modifier/summary/",
                 'description': 'Manage relationships between reports and modifiers'
             }
         },

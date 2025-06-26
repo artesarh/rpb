@@ -71,7 +71,7 @@ THIRD_PARTY_APPS = [
     "schema_viewer",
     "drf_spectacular",
     "rest_framework",
-    "django_filter",
+    "django_filters",
     "django_celery_beat",
 ]
 

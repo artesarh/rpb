@@ -17,6 +17,10 @@ from api.models import (
     Report,
     ReportModifier,
 )
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 class LinkModifierViewSet(ViewSet):
