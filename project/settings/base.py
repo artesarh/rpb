@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import environ
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -236,14 +237,45 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
+# Celery Configuration
 CELERY_BROKER_URL = "filesystem://"  # We'll use filesystem broker for simplicity
+CELERY_RESULT_BACKEND = None  # We don't need to store results for backups
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
 
+# Filesystem broker configuration
 CELERY_BROKER_TRANSPORT_OPTIONS = {
-    "data_folder_in": "celery/queue",
-    "data_folder_out": "celery/queue",
-    "data_folder_processed": "celery/processed",
+    "data_folder_in": BASE_DIR / "celery" / "queue",
+    "data_folder_out": BASE_DIR / "celery" / "queue", 
+    "data_folder_processed": BASE_DIR / "celery" / "processed",
 }
+
+# Celery Beat (Scheduler) Configuration
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Default periodic tasks
+CELERY_BEAT_SCHEDULE = {
+    'backup-databases-daily': {
+        'task': 'project.tasks.run_db_backup',
+        'schedule': 60.0 * 60.0 * 2,  # Every 2 hours (for testing - change to daily)
+        # For daily at 2 AM: 'schedule': crontab(hour=2, minute=0),
+        'options': {
+            'expires': 3600,  # Task expires after 1 hour if not executed
+        }
+    },
+    'test-celery-every-5-minutes': {
+        'task': 'project.tasks.test_task',
+        'schedule': 300.0,  # Every 5 minutes (for testing)
+        'options': {
+            'expires': 60,
+        }
+    },
+}
+
+# Worker configuration
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 50
